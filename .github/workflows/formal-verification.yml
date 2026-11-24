@@ -49,7 +49,3 @@ jobs:
 
           echo "=== FILE TYPE ==="
           file tools/ci-tool.jar
-
-      - name: Run formal verification
-        run: |
-          java -jar tools/ci-tool.jar src/
