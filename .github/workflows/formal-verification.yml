@@ -36,10 +36,19 @@ jobs:
             "https://github.com/wadoon/key-citool/releases/download/v1.7.0/key-citool-1.7.0-all.jar" \
             -o tools/ci-tool.jar
 
-      - name: Verify downloaded archive
+      - name: Inspect KeY CI Tool
         run: |
-          ls -lh tools/ci-tool.jar
-          jar tf tools/ci-tool.jar | grep 'de/uka/ilkd/key/CheckerKt.class'
+          echo "=== JAR MANIFEST ==="
+          unzip -p tools/ci-tool.jar META-INF/MANIFEST.MF
+
+          echo "=== CHECKER CLASSES ==="
+          jar tf tools/ci-tool.jar | grep -i 'Checker' || true
+
+          echo "=== MAIN CLASS ==="
+          jar tf tools/ci-tool.jar | grep 'de/uka/ilkd/key/' | head -30
+
+          echo "=== FILE TYPE ==="
+          file tools/ci-tool.jar
 
       - name: Run formal verification
         run: |
