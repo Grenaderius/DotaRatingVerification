@@ -28,17 +28,19 @@ jobs:
       - name: Compile Java model
         run: javac src/RatingCalculator.java
 
-      - name: Download KeY CI Tool
+      - name: Download KeY CI Tool 1.7.0
         run: |
           mkdir -p tools
+
           curl -fL \
-            "https://formal.iti.kit.edu/weigl/ci-tool/latest.php?type=all" \
+            "https://github.com/wadoon/key-citool/releases/download/v1.7.0/key-citool-1.7.0-all.jar" \
             -o tools/ci-tool.jar
 
-      - name: Check downloaded JAR
+      - name: Verify downloaded archive
         run: |
           ls -lh tools/ci-tool.jar
-          jar tf tools/ci-tool.jar | grep 'CheckerKt.class' || true
+          jar tf tools/ci-tool.jar | grep 'de/uka/ilkd/key/CheckerKt.class'
 
       - name: Run formal verification
-        run: java -jar tools/ci-tool.jar src/
+        run: |
+          java -jar tools/ci-tool.jar src/
