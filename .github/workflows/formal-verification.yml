@@ -20,9 +20,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '21'
 
-      - name: Check Java version
+      - name: Check Java
         run: java -version
 
       - name: Compile Java model
@@ -30,21 +30,15 @@ jobs:
 
       - name: Download KeY CI Tool
         run: |
-          mkdir -p tools build
+          mkdir -p tools
           curl -fL \
             "https://formal.iti.kit.edu/weigl/ci-tool/latest.php?type=all" \
             -o tools/ci-tool.jar
 
-      - name: Run formal verification
+      - name: Check downloaded JAR
         run: |
-          java -jar tools/ci-tool.jar \
-            --xml-output build/key-results.xml \
-            src/
+          ls -lh tools/ci-tool.jar
+          jar tf tools/ci-tool.jar | grep 'CheckerKt.class' || true
 
-      - name: Upload verification report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: key-verification-report
-          path: build/key-results.xml
-          if-no-files-found: ignore
+      - name: Run formal verification
+        run: java -jar tools/ci-tool.jar src/
