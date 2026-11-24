@@ -1,0 +1,50 @@
+
+name: Dota Rating Formal Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  formal-verification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Check Java version
+        run: java -version
+
+      - name: Compile Java model
+        run: javac src/RatingCalculator.java
+
+      - name: Download KeY CI Tool
+        run: |
+          mkdir -p tools build
+          curl -fL \
+            "https://formal.iti.kit.edu/weigl/ci-tool/latest.php?type=all" \
+            -o tools/ci-tool.jar
+
+      - name: Run formal verification
+        run: |
+          java -jar tools/ci-tool.jar \
+            --xml-output build/key-results.xml \
+            src/
+
+      - name: Upload verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: key-verification-report
+          path: build/key-results.xml
+          if-no-files-found: ignore
